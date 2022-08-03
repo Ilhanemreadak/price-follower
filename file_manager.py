@@ -28,9 +28,9 @@ def get_Mail_data():
 def add_product_follower(URL,Price,Mail):
     dataFile = open("data/watched_products.csv", "a")
 
-    CsvWriter = csv.writer(dataFile, delimiter=",")
+    CsvWriter = csv.writer(dataFile, delimiter=",", )
 
-    data = ["\n"+URL, Price, Mail]
+    data = [URL, Price, Mail]
 
     CsvWriter.writerow(data)
 

@@ -7,7 +7,7 @@ headers = keys.headers
 
 def pricefollow(URL, expected_price, mail):
 
-    stores = ["amazon", "hepsiburada", "trendyol"]
+    stores = ["amazon", "hepsiburada", "trendyol", "dolap"]
 
     print("")
 
@@ -15,18 +15,23 @@ def pricefollow(URL, expected_price, mail):
         whc_store = str(URL).find(stores[i])
 
         if (whc_store > 0 and i == 0):
-            whc_store = "amazon"
+            whc_store = stores[i]
             amazon_follower(URL, expected_price, mail, whc_store)
             break
 
         elif (whc_store > 0 and i == 1):
-            whc_store = "hepsiburada"
+            whc_store = stores[i]
             hepsiburada_follower(URL, expected_price, mail, whc_store)
             break
 
         elif (whc_store > 0 and i == 2):
-            whc_store = "trendyol"
+            whc_store = stores[i]
             trendyol_follower(URL, expected_price, mail, whc_store)
+            break
+
+        elif (whc_store > 0 and i == 3):
+            whc_store = stores[i]
+            dolap_follower(URL, expected_price, mail, whc_store)
             break
 
         else:
@@ -43,13 +48,17 @@ def mail_content(store, URL, title, price, mailaddr):
 
 def amazon_follower(URL, expected_price, mailaddr, store):
 
-    page = requests.get(URL, headers=headers)
+    try:
+        page = requests.get(URL, headers=headers)
 
-    soup = BeautifulSoup(page.content, 'html.parser')
+        soup = BeautifulSoup(page.content, 'html.parser')
 
-    title = soup.find(id="productTitle").get_text().strip()
+        title = soup.find(id="productTitle").get_text().strip()
 
-    raw_price = soup.find("span", "a-price-whole").get_text()
+        raw_price = soup.find("span", "a-price-whole").get_text()
+
+    except:
+        print("Ürünün bilgilerine erişilemedi !!.")
 
     converted_price = raw_price.replace(
         ",", "").replace(".", "").replace(" TL", "")
@@ -68,14 +77,17 @@ def amazon_follower(URL, expected_price, mailaddr, store):
 
 def hepsiburada_follower(URL, expected_price, mailaddr, store):
 
-    page=requests.get(URL, headers = headers)
+    try:
+        page=requests.get(URL, headers = headers)
 
-    soup = BeautifulSoup(page.content, 'html.parser')
+        soup = BeautifulSoup(page.content, 'html.parser')
 
-    title = soup.find("span", "product-name").get_text().strip()
+        title = soup.find("span", "product-name").get_text().strip()
 
-    raw_price = soup.select_one(
-        '#offering-price span:first-child').get_text()
+        raw_price = soup.select_one(
+            '#offering-price span:first-child').get_text()
+    except:
+        print("Ürünün bilgilerine erişilemedi !!.")
 
     converted_price = raw_price.replace(
         ",", "").replace(".", "").replace(" TL", "")
@@ -94,23 +106,52 @@ def hepsiburada_follower(URL, expected_price, mailaddr, store):
 
 def trendyol_follower(URL, expected_price, mailaddr, store):
 
-    page=requests.get(URL, headers = headers)
+    try:
+        page = requests.get(URL, headers=headers)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        title = soup.find("h1", "pr-new-br").get_text().strip()
+        try:
+            raw_price = soup.find("div", "pr-bx-nm with-org-prc").get_text()
+            converted_price = raw_price.replace(
+                ",", "").replace(".", "").replace(" TL", "")
+            last_two_index = len(converted_price)
+        except:
+            raw_price = soup.find("span", class_="prc-dsc").get_text()
+            converted_price = raw_price.replace(
+                ",", "").replace(".", "").replace(" TL", "")
+            last_two_index = len(converted_price)-2
+    except:
+        print("Ürünün bilgilerine erişilemedi !!.")
 
-    soup = BeautifulSoup(page.content, 'html.parser')
+    price = int(converted_price[0:last_two_index])
 
-    title = soup.find("h1", "pr-new-br").get_text().strip()
+    print("Ürün Adı : "+title)
+    print("Ürünün Güncel Fiyatı : "+str(price))
+
+    if(price <= expected_price):
+        mail_content(store, URL, title, price, mailaddr)
+
+    print("\n-----------------------------------------\n")
+
+
+def dolap_follower(URL, expected_price, mailaddr, store):
 
     try:
-        raw_price = soup.find("div", "pr-bx-nm with-org-prc").get_text()
-        converted_price = raw_price.replace(
-            ",", "").replace(".", "").replace(" TL", "")
-        last_two_index = len(converted_price)
-    except:
-        raw_price = soup.find("span", class_="prc-dsc").get_text()
-        converted_price = raw_price.replace(
-            ",", "").replace(".", "").replace(" TL", "")
-        last_two_index = len(converted_price)-2
+        page = requests.get(URL, headers=headers)
 
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        title = soup.find("div", class_="title-holder").get_text().strip()
+
+        raw_price = soup.find("span", class_="price").get_text()
+
+    except :
+        print("Ürünün bilgilerine erişilemedi !!.")
+
+
+    converted_price = raw_price.replace(
+        ",", "").replace(".", "").replace(" TL", "")
+    last_two_index = len(converted_price)
 
     price = int(converted_price[0:last_two_index])
 

@@ -6,26 +6,28 @@ import constants as keys
 
 
 def sendMail(toWho, subject, content):
+    try:
+        fromWho = keys.senderMail
+        password = keys.passofsd
+        
+        server = smtplib.SMTP("smtp.gmail.com", 587)
 
-    fromWho = keys.senderMail
-    password = keys.passofsd
-    
-    server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.ehlo() 
+        server.starttls() 
 
-    server.ehlo() 
-    server.starttls() 
+        server.login(fromWho, password)  
 
-    server.login(fromWho, password)  
+        massage = MIMEMultipart()
 
-    massage = MIMEMultipart()
+        massage["From"] = fromWho
+        massage["To"] = toWho
+        massage["Subject"] = subject
 
-    massage["From"] = fromWho
-    massage["To"] = toWho
-    massage["Subject"] = subject
-
-    body_text = MIMEText(content)
-    massage.attach(body_text)
-    
-    server.sendmail(massage["From"], massage["To"],massage.as_string()) 
-    print("Mail Basari Ile Gonderildi")
-    server.close()
+        body_text = MIMEText(content)
+        massage.attach(body_text)
+        
+        server.sendmail(massage["From"], massage["To"],massage.as_string()) 
+        print("Mail Basari Ile Gonderildi")
+        server.close()
+    except:
+        print("Mail Gönderiminde Hatayla Karşılaşıldı !!!")
