@@ -8,16 +8,13 @@ from file_manager import get_Price_data
 from file_manager import get_Mail_data
 
 
-
-list_of_product = [[0 for x in range(3)] for y in range(10)]
-
-for i in range (0,len(list_of_product)):
+while True:
 
     reply = input("Ürün girmek istiyormusunuz (Y/N) : ")
     if reply=='Y' or reply == 'y':
-        tempURL = list_of_product[i][0] = input("Ürünün URL linkini giriniz : ")
-        tempPrice = list_of_product[i][1] = input("Bildirim Fiyatını Giriniz : ")
-        tempMail = list_of_product[i][2] = input("Mail Adresinizi Giriniz : ")
+        tempURL = input("Ürünün URL linkini giriniz : ")
+        tempPrice = input("Bildirim Fiyatını Giriniz : ")
+        tempMail = input("Mail Adresinizi Giriniz : ")
         add_product_follower(tempURL, tempPrice, tempMail)
 
     elif reply == 'N' or reply == 'n':
