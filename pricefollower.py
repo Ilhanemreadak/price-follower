@@ -3,11 +3,11 @@ from bs4 import BeautifulSoup
 from send_mail import sendMail
 import constants as keys
 
-stores = ["amazon", "hepsiburada", "trendyol"]
-
 headers = keys.headers
 
 def pricefollow(URL, expected_price, mail):
+
+    stores = ["amazon", "hepsiburada", "trendyol"]
 
     print("")
 
@@ -16,25 +16,32 @@ def pricefollow(URL, expected_price, mail):
 
         if (whc_store > 0 and i == 0):
             whc_store = "amazon"
-            amazon_follower(URL, expected_price, mail)
+            amazon_follower(URL, expected_price, mail, whc_store)
             break
 
         elif (whc_store > 0 and i == 1):
             whc_store = "hepsiburada"
-            hepsiburada_follower(URL, expected_price, mail)
+            hepsiburada_follower(URL, expected_price, mail, whc_store)
             break
 
         elif (whc_store > 0 and i == 2):
             whc_store = "trendyol"
-            trendyol_follower(URL, expected_price, mail)
+            trendyol_follower(URL, expected_price, mail, whc_store)
             break
 
         else:
             continue
+    
+
+def mail_content(store, URL, title, price, mailaddr):
+    print(str(store).capitalize()+"'da takip ettiğin ürünün fiyatı düştü !!!")
+    content = str(store).capitalize()+"'da takip ettiğin ürünün fiyatı düştü !!! \n"+title+"\nGüncel Fiyat : " + \
+        str(price)+" TL"+"\nÜrün linki : \n"+URL
+    subject = "Ürünün Fiyatı Düştü 😍🔥🔥🔥"
+    sendMail(mailaddr, subject, content=content)
 
 
-
-def amazon_follower(URL, expected_price, mailaddr):
+def amazon_follower(URL, expected_price, mailaddr, store):
 
     page = requests.get(URL, headers=headers)
 
@@ -54,16 +61,12 @@ def amazon_follower(URL, expected_price, mailaddr):
     print("Ürünün Güncel Fiyatı : "+str(price))
 
     if(price <= expected_price):
-        print("Amazonda takip ettiğin ürünün fiyatı düştü !!!")
-        content = title+" Amazonda takip ettiğin ürünün fiyatı düştü !!! \nGüncel Fiyat : " + \
-            str(price)+" TL"+"\nÜrün linki : \n"+URL
-        subject = "Ürünün Fiyatı Düştü 😍🔥🔥🔥"
-        sendMail(mailaddr, subject, content=content)
+        mail_content(store, URL, title, price, mailaddr)
     
     print("\n-----------------------------------------\n")
 
 
-def hepsiburada_follower(URL, expected_price, mailaddr):
+def hepsiburada_follower(URL, expected_price, mailaddr, store):
 
     page=requests.get(URL, headers = headers)
 
@@ -84,16 +87,12 @@ def hepsiburada_follower(URL, expected_price, mailaddr):
     print("Ürünün Güncel Fiyatı : "+str(price))
 
     if(price <= expected_price):
-        print("Hepsiburada da takip ettiğin ürünün fiyatı düştü !!!")
-        content = title+" Hepsiburada da takip ettiğin ürünün fiyatı düştü !!! \nGüncel Fiyat : " + \
-            str(price)+" TL"+"\nÜrün linki : \n"+URL
-        subject = "Ürünün Fiyatı Düştü 😍🔥🔥🔥"
-        sendMail(mailaddr, subject, content=content)
+        mail_content(store, URL, title, price, mailaddr)
 
     print("\n-----------------------------------------\n")
 
 
-def trendyol_follower(URL, expected_price, mailaddr):
+def trendyol_follower(URL, expected_price, mailaddr, store):
 
     page=requests.get(URL, headers = headers)
 
@@ -119,11 +118,8 @@ def trendyol_follower(URL, expected_price, mailaddr):
     print("Ürünün Güncel Fiyatı : "+str(price))
 
     if(price <= expected_price):
-        print("Trendyol da takip ettiğin ürünün fiyatı düştü !!!")
-        content = title+" Trendyol da takip ettiğin ürünün fiyatı düştü !!! \nGüncel Fiyat : " + \
-            str(price)+" TL"+"\nÜrün linki : \n"+URL
-        subject = "Ürünün Fiyatı Düştü 😍🔥🔥🔥"
-        sendMail(mailaddr, subject,content=content)
+        mail_content(store, URL, title, price, mailaddr)
 
     print("\n-----------------------------------------\n")
     
+
